@@ -37,8 +37,20 @@ function __graal_env_cmd_list() {
 }
 
 function __graal_env_cmd_use() {
-    export GRAALENV_HOME="$__graal_env_GRAAL_INSTALL_PREFIX/$1"
-    export JAVA_HOME="$GRAALENV_HOME"
+    local javacmds=(jar java javac javadoc javah javap jvisualvm)
+    if [ "$1" == "system" ]; then
+	for cmd in javacmds; do
+	    unalias $cmd
+	done
+	unset GRAALENV_HOME
+	unset JAVA_HOME
+    else
+	export GRAALENV_HOME="$__graal_env_GRAAL_INSTALL_PREFIX/$1"
+	export JAVA_HOME="$GRAALaENV_HOME"
+	for cmd in javacmds; do
+	    alias $i="$GRAALaENV_HOME/bin/$i"
+	done
+    fi
     if [ "$2" == "-u" ]; then
 	__graal_env_cmd_update_env
     fi
@@ -54,7 +66,9 @@ function __graal_env_cmd_update_env() {
 		sed -i 's/^JAVA_HOME=.*//' "$mxenv"
 	    fi
 	fi
-	echo JAVA_HOME="$GRAALENV_HOME" >> "mx.${currentdir}/env"
+	if [ -n "$JAVA_HOME" ]; then
+	    echo JAVA_HOME="$GRAALENV_HOME" >> "mx.${currentdir}/env"
+	fi
     fi
 }
 
@@ -240,4 +254,5 @@ __graal_env_inner_list_installed() {
 	    fi
 	fi
     done
+    echo "system"
 }
