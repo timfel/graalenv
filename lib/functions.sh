@@ -51,7 +51,7 @@ function __graal_env_cmd_update_env() {
     if [ -d "$mxdir" ]; then
 	if [ -e "$mxenv" ]; then
 	    if cat "$mxenv" | grep JAVA_HOME >/dev/null; then
-		sed -i 's/^JAVA_HOME=.*//'
+		sed -i 's/^JAVA_HOME=.*//' "$mxenv"
 	    fi
 	fi
 	echo JAVA_HOME="$GRAALENV_HOME" >> "mx.${currentdir}/env"
