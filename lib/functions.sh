@@ -46,9 +46,9 @@ function __graal_env_cmd_use() {
 	unset JAVA_HOME
     else
 	export GRAALENV_HOME="$__graal_env_GRAAL_INSTALL_PREFIX/$1"
-	export JAVA_HOME="$GRAALaENV_HOME"
-	for cmd in javacmds; do
-	    alias $i="$GRAALaENV_HOME/bin/$i"
+	export JAVA_HOME="$GRAALENV_HOME"
+	for cmd in ${javacmds[@]}; do
+	    alias $cmd="$GRAALENV_HOME/bin/$cmd"
 	done
     fi
     if [ "$2" == "-u" ]; then
