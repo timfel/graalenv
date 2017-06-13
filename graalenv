@@ -1,0 +1,60 @@
+#!/bin/bash
+
+GRAALENV_DIR=`dirname ${BASH_SOURCE[0]}`
+GRAALENV_DIR=`readlink -f ${GRAALENV_DIR}`
+
+source $GRAALENV_DIR/lib/constants.sh
+
+graalenv() {
+    source $GRAALENV_DIR/lib/functions.sh
+    for i in `typeset -F`; do
+	if [[ "$i" == __graal_env_cmd_$1 ]]; then
+	    __graal_env_cmd_$1 "${@:2}"
+	    local exitcode=$?
+	    __graal_env_unset_all
+	    return $exitcode
+	fi
+    done
+    __graal_env_cmd_help
+    __graal_env_unset_all
+}
+
+mx() {
+    source $GRAALENV_DIR/lib/functions.sh
+    __graal_env_mx "$@"
+    local exitcode=$?
+    __graal_env_unset_all
+    return $exitcode
+}
+
+__graal_env_install_bash_completion() {
+    source $GRAALENV_DIR/lib/functions.sh
+    GRAALENV_COMMANDS="$(__graal_env_determine_commands)"
+
+    _graalenv() 
+    {
+	local cur prev opts
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	if [[ "$prev" == "use" ]]; then
+	    opts="$(graalenv list --porcelain)"	    
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur##use}) )
+	elif [[ "$prev" == "uninstall" ]]; then
+	    opts="$(graalenv list --porcelain)"
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur##use}) )
+	elif [[ "$prev" == "install" ]]; then
+	    opts="$(graalenv available)"
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur##install}) )
+	else
+	    COMPREPLY=( $(compgen -W "${GRAALENV_COMMANDS}" -- ${cur}) )
+	fi
+	return 0
+    }
+    complete -F _graalenv graalenv
+
+    __graal_env_unset_all
+}
+
+__graal_env_install_bash_completion
+unset -f __graal_env_install_bash_completion
