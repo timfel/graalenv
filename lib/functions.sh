@@ -229,7 +229,7 @@ __graal_env_inner_list_installed() {
 	if [ "$i" == "*" ]; then
 	    echo "No graal env installed"
 	else
-	    if [ "$1" == "--porcelain" ] || [ -n "$JAVA_HOME" ]; then
+	    if [ "$1" == "--porcelain" ] || [ -z "$JAVA_HOME" ]; then
 		echo "$i"
 	    else
 		if [ "$(basename $JAVA_HOME)" == "$i" ]; then
