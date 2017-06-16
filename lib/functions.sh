@@ -39,8 +39,8 @@ function __graal_env_cmd_list() {
 function __graal_env_cmd_use() {
     local javacmds=(jar java javac javadoc javah javap jvisualvm)
     if [ "$1" == "system" ]; then
-	for cmd in javacmds; do
-	    unalias $cmd
+	for cmd in ${javacmds[@]}; do
+	    unalias $cmd 2>/dev/null
 	done
 	unset GRAALENV_HOME
 	unset JAVA_HOME
