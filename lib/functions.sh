@@ -156,6 +156,19 @@ __graal_env_clone_mx() {
     fi
 }
 
+__graal_env_update_mx() {
+    if [ ! -d "$__graal_env_MX_SRC_DIR" ]; then
+	git clone "$GRAALENV_MX_REPOSITORY" "$__graal_env_MX_SRC_DIR"
+	return $?
+    else
+	__graal_env_pushd "$__graal_env_MX_SRC_DIR"
+	git pull
+	local exitcode=$?
+	__graal_env_popd
+	return $exitcode
+    fi
+}
+
 __graal_env_clone_graal() {
     if [ ! -d "$__graal_env_GRAAL_SRC_DIR" ]; then
 	hg clone "$GRAALENV_JVMCI_REPOSITORY" "$__graal_env_GRAAL_SRC_DIR"
