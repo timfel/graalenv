@@ -21,6 +21,17 @@ function __graal_env_cmd_install() {
     return 0
 }
 
+function __graal_env_cmd_selfupdate() {
+    __graal_env_pushd "$GRAALENV_DIR"
+    git pull
+    __graal_env_popd
+    source "$GRAALENV_DIR"/graalenv
+}
+
+function __graal_env_cmd_update() {
+    __graal_env_checkout_graal
+}
+
 function __graal_env_cmd_uninstall() {
     rm -rf --one-filesystem "$__graal_env_GRAAL_INSTALL_PREFIX/$1"
 }
@@ -187,6 +198,12 @@ __graal_env_inner_checkout_graal() {
 	hg update -r $1 -C
 	if [ $? -ne 0 ]; then
 	    echo "Error getting graal revision $1"
+	    return 1
+	fi
+    else
+	hg update -C
+	if [ $? -ne 0 ]; then
+	    echo "Error getting updating graal"
 	    return 1
 	fi
     fi
