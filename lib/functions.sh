@@ -51,14 +51,18 @@ function __graal_env_cmd_list() {
 
 function __graal_env_cmd_use() {
     local javacmds=(jar java javac javadoc javah javap jvisualvm)
-    if [ "$1" == "system" ]; then
+    local target="$1"
+    if [ "$target" == "latest" ]; then
+	target=`ls "$__graal_env_GRAAL_INSTALL_PREFIX/" | sort | tail -1`
+    fi
+    if [ "$target" == "system" ]; then
 	for cmd in ${javacmds[@]}; do
 	    unalias $cmd 2>/dev/null
 	done
 	unset GRAALENV_HOME
 	unset JAVA_HOME
     else
-	export GRAALENV_HOME="$__graal_env_GRAAL_INSTALL_PREFIX/$1"
+	export GRAALENV_HOME="$__graal_env_GRAAL_INSTALL_PREFIX/$target"
 	export JAVA_HOME="$GRAALENV_HOME"
 	for cmd in ${javacmds[@]}; do
 	    alias $cmd="$GRAALENV_HOME/bin/$cmd"
@@ -286,7 +290,11 @@ __graal_env_inner_list_installed() {
 	    fi
 	fi
     done
-    echo "system"
+    if [ -z "$JAVA_HOME" ]; then
+	echo "(*) system"
+    else
+	echo "system"
+    fi
 }
 
 __graal_env_update_netbeans() {
