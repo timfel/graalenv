@@ -4,6 +4,8 @@ __graal_env_MX_SRC_DIR="$GRAALENV_DIR/mx"
 __graal_env_MX_SCRIPT="$__graal_env_MX_SRC_DIR/mx"
 __graal_env_GRAAL_SRC_DIR=$GRAALENV_DIR/graal-jvmci
 __graal_env_GRAAL_INSTALL_PREFIX=$GRAALENV_DIR/products
+__graal_env_NB_DOWNLOAD_DIR="$GRAALENV_DIR/netbeans_download"
+__graal_env_NB_INSTALL_DIR="$GRAALENV_DIR/netbeans"
 
 # Commands, these are the highlevel commands available
 
@@ -28,7 +30,7 @@ function __graal_env_cmd_selfupdate() {
     source "$GRAALENV_DIR"/graalenv
 }
 
-function __graal_env_cmd_update() {
+function __graal_env_cmd_update_jvmci() {
     __graal_env_checkout_graal
 }
 
@@ -167,7 +169,7 @@ __graal_env_clone_mx() {
     fi
 }
 
-__graal_env_update_mx() {
+__graal_env_cmd_update_mx() {
     if [ ! -d "$__graal_env_MX_SRC_DIR" ]; then
 	git clone "$GRAALENV_MX_REPOSITORY" "$__graal_env_MX_SRC_DIR"
 	return $?
@@ -285,4 +287,38 @@ __graal_env_inner_list_installed() {
 	fi
     done
     echo "system"
+}
+
+__graal_env_update_netbeans() {
+    echo "Updating Netbeans..."
+    mkdir -p "$__graal_env_NB_DOWNLOAD_DIR"
+    mkdir -p "$__graal_env_NB_INSTALL_DIR"
+    # download and extract
+    local zipfile=`curl -L http://bits.netbeans.org/download/trunk/nightly/latest/zip | grep javase\.zip | cut -f 2 -d'"'`
+    __graal_env_pushd "$__graal_env_NB_DOWNLOAD_DIR"
+    wget -C "http://bits.netbeans.org/download/trunk/nightly/latest/zip/${zipfile}"
+    unzip -uoq "$zipfile" -d "$__graal_env_NB_INSTALL_DIR"
+    # remove any older zipfiles
+    for i in *.zip; do
+	if [ "$i" != "$zipfile" ]; then
+	    rm "$i"
+	fi
+    done
+    __graal_env_popd
+
+    # if we have only a netbeans subfolder, remove that
+    __graal_env_pushd "$__graal_env_NB_INSTALL_DIR"
+    if [ "$(ls)" == "netbeans" ]; then
+	mv netbeans/* .
+	rmdir netbeans
+    fi
+    echo "Current netbeans space usage: "
+    du -hc -d 1 $__graal_env_NB_INSTALL_DIR
+}
+
+__graal_env_netbeans() {
+    if [ ! -e "${__graal_env_NB_INSTALL_DIR}/bin/netbeans" ]; then
+	__graal_env_update_netbeans
+    fi
+    "${__graal_env_NB_INSTALL_DIR}/bin/netbeans"
 }
