@@ -320,7 +320,9 @@ __graal_env_update_netbeans() {
 	mv netbeans/* .
 	rmdir netbeans
     fi
-    sed -i 's/netbeans_default_options="\(.*\)"/netbeans_default_options="\1 -J-Dapple.laf.useScreenMenuBar=true -J-Dapple.awt.graphics.UseQuartz=true -J-Dsun.java2d.noddraw=true -J-Dsun.java2d.dpiaware=true -J-Dsun.zip.disableMemoryMapping=true -J-Dswing.aatext=true -J-Dawt.useSystemAAFontSettings=on -J-DCachingArchiveProvider.disableCtSym=true"/' etc/netbeans.conf
+    sed -i 's/netbeans_default_options="\(.*\)"/netbeans_default_options="\1 -J-Dswing.aatext=true -J-Dawt.useSystemAAFontSettings=on -J-DCachingArchiveProvider.disableCtSym=true"/' etc/netbeans.conf
+    sed -i 's/-J-Dnetbeans.logger.console=true/-J-Dnetbeans.logger.console=false/' etc/netbeans.conf
+    sed -i 's/-J-Dplugin.manager.check.updates=false/-J-Dplugin.manager.check.updates=true/' etc/netbeans.conf
     __graal_env_popd
 
     echo "Current netbeans space usage: "
