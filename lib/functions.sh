@@ -231,9 +231,12 @@ __graal_env_inner_build_graal() {
     fi
     export JAVA_HOME=$(__graal_env_set_system_oracle)
     echo "JAVA_HOME=$JAVA_HOME" > mx.jvmci/env
+    local default_dynamic_imps=$DEFAULT_DYNAMIC_IMPORTS
+    unset DEFAULT_DYNAMIC_IMPORTS
     __graal_env_mx clean
     __graal_env_mx build
     local exitcode=$?
+    DEFAULT_DYNAMIC_IMPORTS=$default_dynamic_imps
     if [ -n "$old_java_home" ]; then
 	export JAVA_HOME="$old_java_home"
     else
