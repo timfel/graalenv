@@ -304,7 +304,7 @@ __graal_env_update_netbeans() {
     # download and extract
     local zipfile=`curl -L http://bits.netbeans.org/download/trunk/nightly/latest/zip | grep javase\.zip | cut -f 2 -d'"'`
     __graal_env_pushd "$__graal_env_NB_DOWNLOAD_DIR"
-    wget -C "http://bits.netbeans.org/download/trunk/nightly/latest/zip/${zipfile}"
+    wget -c "http://bits.netbeans.org/download/trunk/nightly/latest/zip/${zipfile}"
     unzip -uoq "$zipfile" -d "$__graal_env_NB_INSTALL_DIR"
     # remove any older zipfiles
     for i in *.zip; do
