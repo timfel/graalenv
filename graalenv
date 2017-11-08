@@ -32,6 +32,8 @@ mx() {
     fi
 }
 
+export PATH=$PATH:$GRAALENV_DIR/mx/
+
 netbeans() {
     source $GRAALENV_DIR/lib/functions.sh
     if [ "$1" == "selfupdate" ]; then
