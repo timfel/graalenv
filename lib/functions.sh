@@ -74,8 +74,8 @@ function __graal_env_cmd_use() {
 }
 
 function __graal_env_cmd_update_env() {
-    local currentdir=`basename $(pwd)`
-    local mxdir="mx.${currentdir}"
+    local suite=$(__graal_env_get_suite)
+    local mxdir="mx.${suite}"
     local mxenv="${mxdir}/env"
     if [ -d "$mxdir" ]; then
 	if [ -e "$mxenv" ]; then
@@ -84,7 +84,7 @@ function __graal_env_cmd_update_env() {
 	    fi
 	fi
 	if [ -n "$JAVA_HOME" ]; then
-	    echo JAVA_HOME="$GRAALENV_HOME" >> "mx.${currentdir}/env"
+	    echo JAVA_HOME="$GRAALENV_HOME" >> "${mxenv}"
 	fi
     fi
 }
@@ -101,6 +101,42 @@ function __graal_env_cmd_help() {
 function __graal_env_cmd_mx() {
     __graal_env_mx "$@"
     return $?
+}
+
+function __graal_env_get_suite() {
+    for d in `find . -maxdepth 1 -type d -name "mx.*"`; do
+        if [ d != "./mx.imports" ]; then
+            # binary imports are not a suite
+            echo ${d##*.}
+            return
+        fi
+    done
+}
+
+function __graal_env_cmd_format() {
+    local suite=$(__graal_env_get_suite)
+    local ECLIPSE_EXE=""
+    if ! grep ECLIPSE_EXE "mx.${suite}/env"; then
+        if [ -z "$ECLIPSE_EXE" ]; then
+            local currentdir=$(pwd)
+            ECLIPSE_EXE=`find ${currentdir} -executable -type f -name "eclipse" | head -1`
+            if [ -z "$ECLIPSE_EXE" ]; then
+                currentdir=`dirname ${currentdir}`
+                ECLIPSE_EXE=`find ${currentdir} -executable -type f -name "eclipse" | head -1`
+                if [ -z "$ECLIPSE_EXE" ]; then
+                    currentdir=`dirname ${currentdir}`
+                    ECLIPSE_EXE=`find ${currentdir} -executable -type f -name "eclipse" | head -1`
+                fi
+                if [ -z "$ECLIPSE_EXE" ]; then
+                    # give up
+                    echo "Could not find eclipse binary here or at most two directories up"
+                    return -1
+                fi
+            fi
+        fi
+        echo ECLIPSE_EXE="$ECLIPSE_EXE" >> "mx.${currentdir}/env"
+    fi
+    __graal_env_mx eclipseformat
 }
 
 # Implementation functions
