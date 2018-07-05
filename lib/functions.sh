@@ -224,7 +224,7 @@ __graal_env_cmd_update_mx() {
 
 __graal_env_clone_graal() {
     if [ ! -d "$__graal_env_GRAAL_SRC_DIR" ]; then
-	hg clone "$GRAALENV_JVMCI_REPOSITORY" "$__graal_env_GRAAL_SRC_DIR"
+	git clone "$GRAALENV_JVMCI_REPOSITORY" "$__graal_env_GRAAL_SRC_DIR"
     fi
 }
 
@@ -234,16 +234,17 @@ __graal_env_checkout_graal() {
 }
 
 __graal_env_inner_checkout_graal() {
-    hg pull
-    hg status -un -i | xargs rm 2>/dev/null
+    git pull
+    git clean -fdx
     if [ -n "$1" ]; then
-	hg update -r $1 -C
+	git checkout $1
+        git clean -fdx
 	if [ $? -ne 0 ]; then
 	    echo "Error getting graal revision $1"
 	    return 1
 	fi
     else
-	hg update -C
+	git clean -fdx
 	if [ $? -ne 0 ]; then
 	    echo "Error getting updating graal"
 	    return 1
@@ -270,7 +271,7 @@ __graal_env_inner_build_graal() {
     local default_dynamic_imps=$DEFAULT_DYNAMIC_IMPORTS
     unset DEFAULT_DYNAMIC_IMPORTS
     __graal_env_mx clean
-    __graal_env_mx build
+    __graal_env_mx --vm=server build -DFULL_DEBUG_SYMBOLS=0
     local exitcode=$?
     DEFAULT_DYNAMIC_IMPORTS=$default_dynamic_imps
     if [ -n "$old_java_home" ]; then
@@ -305,7 +306,7 @@ __graal_env_list_graal_tags() {
 }
 
 __graal_env_inner_list_graal_tags() {
-    hg tags | grep jvmci | cut -d' ' -f 1
+    git tag -l | grep jvmci | cut -d' ' -f 1
 }
 
 __graal_env_list_installed() {
