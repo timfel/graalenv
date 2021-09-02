@@ -53,7 +53,7 @@ function __graal_env_cmd_use() {
     local javacmds=(jar java javac javadoc javah javap jvisualvm)
     local target="$1"
     if [ "$target" == "latest" ]; then
-	target=`ls "$__graal_env_GRAAL_INSTALL_PREFIX/" | sort | tail -1`
+	target=`ls -t "$__graal_env_GRAAL_INSTALL_PREFIX/" | head -1`
     fi
     if [ "$target" == "system" ]; then
 	for cmd in ${javacmds[@]}; do
